@@ -222,9 +222,10 @@
 
   .media-default-grid {
     width: 100%;
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 8px 12px;
+    display: flex;
+    align-items: center;
+    flex-wrap: nowrap;
+    gap: 14px;
     margin-bottom: 10px;
 
     label {
@@ -238,8 +239,9 @@
       cursor: pointer;
     }
 
-    input {
+    input[type='checkbox'] {
       margin: 0;
+      accent-color: var(--primary);
     }
   }
 
@@ -433,6 +435,10 @@
     .concurrency-inline-options,
     .format-grid {
       max-width: none;
+    }
+
+    .media-default-grid {
+      flex-wrap: wrap;
     }
 
     .format-grid {
