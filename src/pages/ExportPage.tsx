@@ -1513,6 +1513,7 @@ function ExportPage() {
   const [nowTick, setNowTick] = useState(Date.now())
   const [isContactsListAtTop, setIsContactsListAtTop] = useState(true)
   const [isContactsHeaderDragging, setIsContactsHeaderDragging] = useState(false)
+  const [contactsListScrollParent, setContactsListScrollParent] = useState<HTMLDivElement | null>(null)
   const [contactsHorizontalScrollMetrics, setContactsHorizontalScrollMetrics] = useState({
     viewportWidth: 0,
     contentWidth: 0
@@ -1599,6 +1600,10 @@ function ExportPage() {
     startIndex: 0,
     endIndex: -1
   })
+
+  const handleContactsListScrollParentRef = useCallback((node: HTMLDivElement | null) => {
+    setContactsListScrollParent(prev => (prev === node ? prev : node))
+  }, [])
 
   const ensureExportCacheScope = useCallback(async (): Promise<string> => {
     if (exportCacheScopeReadyRef.current) {
@@ -6492,11 +6497,13 @@ function ExportPage() {
                   ) : (
                     <div
                       className="contacts-list"
+                      ref={handleContactsListScrollParentRef}
                       onWheelCapture={handleContactsListWheelCapture}
                     >
                       <Virtuoso
                         ref={contactsVirtuosoRef}
                         className="contacts-virtuoso"
+                        customScrollParent={contactsListScrollParent ?? undefined}
                         data={filteredContacts}
                         computeItemKey={(_, contact) => contact.username}
                         fixedItemHeight={76}
