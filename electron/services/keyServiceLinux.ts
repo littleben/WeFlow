@@ -3,7 +3,8 @@ import { join } from 'path'
 import { existsSync, readdirSync, statSync, readFileSync } from 'fs'
 import { execFile, exec } from 'child_process'
 import { promisify } from 'util'
-import sudo from 'sudo-prompt'
+import { createRequire } from 'module';
+const require = createRequire(import.meta.url);
 
 const execFileAsync = promisify(execFile)
 const execAsync = promisify(exec)
@@ -12,6 +13,15 @@ type DbKeyResult = { success: boolean; key?: string; error?: string; logs?: stri
 type ImageKeyResult = { success: boolean; xorKey?: number; aesKey?: string; error?: string }
 
 export class KeyServiceLinux {
+  private sudo: any
+
+  constructor() {
+    try {
+      this.sudo = require('sudo-prompt');
+    } catch (e) {
+      console.error('Failed to load sudo-prompt', e);
+    }
+  }
 
   private getHelperPath(): string {
     const isPackaged = app.isPackaged
@@ -99,7 +109,7 @@ export class KeyServiceLinux {
         const options = { name: 'WeFlow' }
         const command = `"${helperPath}" db_hook ${pid} ${targetAddr}`
 
-        sudo.exec(command, options, (error, stdout) => {
+        this.sudo.exec(command, options, (error, stdout) => {
           execAsync(`kill -CONT ${pid}`).catch(() => {})
           if (error) {
             onStatus?.('授权失败或被取消', 2)
